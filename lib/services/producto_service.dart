@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:productos_app/models/producto.dart';
 
@@ -7,6 +8,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ProductoService extends ChangeNotifier {
+  
+  final databaseReference = FirebaseDatabase.instance.ref();
   final String _baseUrl = 'huaweiintership-default-rtdb.firebaseio.com';
 
   final List<Producto> productos = [];
@@ -27,7 +30,7 @@ class ProductoService extends ChangeNotifier {
     bool isLoading = true;
     notifyListeners();
     
-    final url = Uri.https(_baseUrl, 'productos.json');
+    final url = Uri.https(_baseUrl, 'candidatos.json');
     final resp = await http.get(url);
 
     final Map<String, dynamic> productosMAp = json.decode(resp.body);
@@ -51,7 +54,7 @@ class ProductoService extends ChangeNotifier {
 
   //metodo para actualizar un producto en la BD
   Future<String> updateProducto(Producto producto) async {
-    final url = Uri.https(_baseUrl, 'productos/${producto.id}.json');
+    final url = Uri.https(_baseUrl, 'candidatos/${producto.id}.json');
     final resp = await http.put(url, body: producto.toJson());
     final decodeData = resp.body;
 
@@ -63,14 +66,14 @@ class ProductoService extends ChangeNotifier {
     return producto.id!;
   }
 
+  
   //método para crear o actualizar un producto
   Future saveOrCreateProducto(Producto producto) async {
     isSaving = true;
     notifyListeners();
 
     if (producto.id == null) {
-      //producto nuevo
-      await this.createProducto(producto);
+          await this.createProducto(producto); 
     } else {
       //actualizar producto existente
       await this.updateProducto(producto);
@@ -80,9 +83,14 @@ class ProductoService extends ChangeNotifier {
     notifyListeners();
   }
 
+
+bool productoExistete(){
+    return true;
+  }
+
   //metodo para crear un producto nuevo
   Future<String> createProducto(Producto producto) async{
-    final url = Uri.https(_baseUrl,'productos.json');
+    final url = Uri.https(_baseUrl,'candidatos.json');
     final resp = await http.post(url, body:producto.toJson());
     final decodeData = json.decode(resp.body);
 

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -5,12 +6,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/src/material/text_form_field.dart';
 import 'package:productos_app/providers/producto_form_provider.dart';
 import 'package:productos_app/services/producto_service.dart';
-import 'package:productos_app/widgets/fondo_huawei.dart';
 import 'package:productos_app/widgets/fondo_login.dart';
 import 'package:productos_app/widgets/imagen_producto.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+
+final nameController = TextEditingController();
+final telefonoController = TextEditingController();
+final emailController = TextEditingController();
+
+String urlPath = "";
 
 class ProductoPage extends StatelessWidget {
   @override
@@ -128,26 +136,32 @@ class _ProductoPageBodyState extends State<_ProductoPageBody> {
               ),
               onPressed: () async {
           if (!productoForm.isValidForm()) return;
-          //SUBIR ARCHIVO
+          //SUBIR ARCHIVO 
 
           final path = 'files/${pickedFile!.name}';
           final file = File(pickedFile!.path!);
           final ref = FirebaseStorage.instance.ref().child(path);
           uploadTask = ref.putFile(file);
           final snapshot = await uploadTask!.whenComplete(() {
-            print("completado archivo");
+            //print("completado archivo");
           });
           String urlDownload = await snapshot.ref.getDownloadURL();
+          urlPath = urlDownload;
           print('url file: $urlDownload');
-
+          
           final String? imagenUrl = await widget.productoService.uploadImage();
 
           if (urlDownload != null) {
             productoForm.producto.cv = urlDownload;
           }
+          sendEmail();
           await widget.productoService
               .saveOrCreateProducto(productoForm.producto);
+
+          final form = productoForm.FormKey.currentState;
+
           Navigator.of(context).pop();
+          
         },
             )
                 ],
@@ -158,6 +172,29 @@ class _ProductoPageBodyState extends State<_ProductoPageBody> {
     );
   }
 }
+
+Future sendEmail() async {
+		final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send-form');
+		const serviceId = "service_fpw0asd";
+		const templateId = "template_idzwizi";
+		const userId = "Hs8RrtBuyHiII5Wu7";
+		final response = await http.post(url,
+		headers: {'Content-Type': 'application/json'},
+			body: json.encode({
+			"service_id": serviceId,
+			"template_id": templateId,
+			"user_id": userId,
+			"template_params":{
+				"from_user": nameController.text,
+				"tel_user": telefonoController.text,
+				"email_user": emailController.text,
+        "CV": "${urlPath}",			
+        },
+			})
+		);
+		return response.statusCode;
+	}
+
 
 class _ProductoForm extends StatelessWidget {
   @override
@@ -193,7 +230,8 @@ class _ProductoForm extends StatelessWidget {
                   height: 40,
                 ),
                 TextFormField(
-                  initialValue: producto.nombre,
+                  controller: nameController,
+                  //initialValue: producto.nombre,
                   onChanged: (value) => producto.nombre = value,
                   validator: (value) {
                     String pattern =
@@ -228,7 +266,7 @@ class _ProductoForm extends StatelessWidget {
                   height: 15,
                 ),
                 TextFormField(
-                  initialValue: producto.correo,
+                  //initialValue: producto.correo,
                   onChanged: (value) => producto.correo = value,
                   validator: (value) {
                     String pattern =
@@ -238,6 +276,7 @@ class _ProductoForm extends StatelessWidget {
                         ? null
                         : 'El correo no es válido';
                   },
+                  controller: emailController,
                   decoration: InputDecoration(
                       hintText: 'correo.ejemplo@gmail.com',
                       labelText: 'Correo electrónico:',
@@ -262,7 +301,7 @@ class _ProductoForm extends StatelessWidget {
                 SizedBox(
                   height: 15,
                 ),TextFormField(
-                  initialValue: '${producto.telefono}',
+                  //initialValue: '${producto.telefono}',
                   onChanged: (value) {
                     if (double.tryParse(value) == null) {
                       producto.telefono = "nada";
@@ -277,6 +316,7 @@ class _ProductoForm extends StatelessWidget {
                         ? null
                         : 'El nombre no es válido';
                   },
+                  controller: telefonoController,
                   decoration: InputDecoration(
                     hintText: 'ej 999 999 99 99',
                     labelText: 'telefono',
