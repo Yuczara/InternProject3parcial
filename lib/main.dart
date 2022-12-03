@@ -1,5 +1,6 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:productos_app/Pages/datos_page.dart';
 import 'package:productos_app/Pages/home_page.dart';
 import 'package:productos_app/Pages/login_page.dart';
 import 'package:productos_app/Pages/producto_page.dart';
@@ -47,14 +48,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'HuaweiIntern',
-      initialRoute: 'home',
+      initialRoute: 'login',
       routes: {
         'login': (_) => LoginPage(),
         'home': (_) => HomePage(),
         'producto': (_) => ProductoPage(),
         'register': (_) => RegisterPage(),
         'uploadFile':(_)=> UploadFile(),
-        //'demo':(_)=> FirebaseDemoScreen(),
+        'candidatos':(_)=>DatosPage(),
       },
       theme: ThemeData.light().copyWith(
           scaffoldBackgroundColor: Color.fromARGB(255, 231, 243, 231),

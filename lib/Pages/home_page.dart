@@ -138,9 +138,72 @@ class HomePage extends StatelessWidget {
                             SizedBox(width: 28),
                           ],
                         ),
+                        SizedBox(height: 25,),
                       ],
                     ),
                   ),
+                  Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    margin: EdgeInsets.all(25),
+                    color: Colors.blue.shade900,
+                    elevation: 10,
+                    child: Column(
+                      children: <Widget>[
+                        ListTile(
+                          contentPadding: EdgeInsets.fromLTRB(30, 10, 15, 0),
+                          title: Text(
+                            'Interns Information',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                fontSize: 28),
+                          ),
+                          subtitle: Text(
+                            'Contact information & cv',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 22,
+                                height: 1.5),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final productoService =
+                                Navigator.pushNamed(context, 'candidatos');
+                              },
+                              child: Text(
+                                'Go',
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.black38,
+                              ),
+                            ),
+                            SizedBox(width: 28),
+                          ],
+                        ),
+                        SizedBox(height: 25,),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: IconButton(onPressed: (){
+                      Navigator.pushNamed(context, 'login');
+                    }, 
+                    icon: Icon(
+                              Icons.power_settings_new_sharp,
+                              size: 70,
+                              color: Colors.red,
+                            ),
+                    ),
+                  ),
+                  SizedBox(height: 40,),
                 ],
               ),
             ),
